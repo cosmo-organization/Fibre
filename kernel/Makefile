@@ -50,11 +50,11 @@ $(ARCHDIR)/crtn.o \
 .PHONY: all clean install install-headers install-kernel
 .SUFFIXES: .o .c .S
 
-all: Fibre.kernel
+all: $(OSNAME).kernel
 
-Fibre.kernel: $(OBJS) $(ARCHDIR)/linker.ld
+$(OSNAME).kernel: $(OBJS) $(ARCHDIR)/linker.ld
 	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
-	grub-file --is-x86-multiboot Fibre-$(HOST).kernel
+	grub-file --is-x86-multiboot $(OSNAME).kernel
 
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
@@ -66,7 +66,7 @@ $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 clean:
-	rm -f Fibre-$(HOST).kernel
+	rm -f $(OSNAME).kernel
 	rm -f $(OBJS) *.o */*.o */*/*.o
 	rm -f $(OBJS:.o=.d) *.d */*.d */*/*.d
 
@@ -76,8 +76,8 @@ install-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
 	cp -R --preserve=timestamps include/. $(DESTDIR)$(INCLUDEDIR)/.
 
-install-kernel: Fibre.kernel
+install-kernel: $(OSNAME).kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
-	cp Fibre-$(HOST).kernel $(DESTDIR)$(BOOTDIR)
+	cp $(OSNAME).kernel $(DESTDIR)$(BOOTDIR)
 
 -include $(OBJS:.o=.d)
