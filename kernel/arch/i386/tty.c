@@ -56,3 +56,17 @@ void terminal_write(const char* data, size_t size) {
 void terminal_writestring(const char* data) {
 	terminal_write(data, strlen(data));
 }
+
+void terminal_putachar(unsigned char color,char c){
+	unsigned char uc = c;
+	terminal_putentryat(uc, color, terminal_column, terminal_row);
+	if (++terminal_column == VGA_WIDTH) {
+		terminal_column = 0;
+		if (++terminal_row == VGA_HEIGHT)
+			terminal_row = 0;
+	}
+}
+
+size_t get_terminal_color(){
+	return terminal_color;
+}
