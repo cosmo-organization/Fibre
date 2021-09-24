@@ -15,12 +15,12 @@ static size_t terminal_row;
 static size_t terminal_column;
 static uint8_t terminal_color;
 static uint16_t *terminal_buffer;
-static unsigned char asup = 0x0;
+static unsigned char asup = 0;
 //Terminal Intialization
-void terminal_initialize(uint8_t asup)
+void terminal_initialize(uint8_t _asup)
 {
 	terminal_row = 0;
-	asup = asup;
+	asup = _asup;
 	terminal_column = 0;
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	terminal_buffer = VGA_MEMORY;
@@ -38,7 +38,7 @@ void terminal_initialize(uint8_t asup)
 
 void update_coord()
 {
-	if (asup != 0x00)
+	if (asup == 0)
 	{
 		if (terminal_column==VGA_WIDTH-1){
 			terminal_column=0;
@@ -50,7 +50,8 @@ void update_coord()
 		}else{
 			terminal_column++;
 		}
-	}else if(asup==0x01){
+	}else if(asup==1){
+
 		if (terminal_column==VGA_WIDTH-1){
 			terminal_column=0;
 			if (terminal_row==VGA_HEIGHT-1){
@@ -133,21 +134,16 @@ void set_terminal_pos(size_t x, size_t y)
 
 void auto_scroll_up()
 {
-	if (asup == 0x1)
-	{
-		if (terminal_row > 0)
-		{
-			uint16_t idx = 1;
-			uint16_t ctr = 0;
-			terminal_row--;
-			for (idx = 1; idx < VGA_HEIGHT; idx++)
-			{
-				for (ctr = 0; ctr < VGA_WIDTH; ctr++)
-				{
-					terminal_putentryat(get_terminal_char_at(ctr, idx), get_terminal_color_at(ctr, idx), ctr, idx - 1);
-				}
-			}
+	for (size_t y=1;y<VGA_HEIGHT;y++){
+		for (size_t x=0;x<VGA_WIDTH;x++){
+			terminal_putentryat(' ',terminal_color,x,y-1);
 		}
+		for (size_t x=0;x<VGA_WIDTH;x++){
+			terminal_putentryat(get_terminal_char_at(x,y),get_terminal_color_at(x,y),x,y-1);
+		}
+	}
+	for (size_t x=0;x<VGA_WIDTH;x++){
+		terminal_putentryat(' ',terminal_color,x,VGA_HEIGHT-1);
 	}
 }
 
@@ -169,4 +165,13 @@ uint8_t entry_get_color(uint16_t buff)
 uint8_t entry_get_char(uint16_t buff)
 {
 	return (uint8_t)(buff)&0x00FF;
+}
+
+void new_line(){
+	if (terminal_row==VGA_HEIGHT-1){
+		if (asup==1){auto_scroll_up();terminal_column=0;}
+	}else{
+		terminal_column=0;
+		terminal_row+=1;
+	}
 }
