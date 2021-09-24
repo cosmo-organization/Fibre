@@ -9,8 +9,6 @@ void terminal_putchar(char c);
 void terminal_putachar(unsigned char color,char c);
 void terminal_write(const char* data, size_t size);
 void terminal_writestring(const char* data);
-void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y);
-void terminal_putentryat_whole(uint16_t buff,size_t x,size_t y);
 uint8_t get_terminal_char_at(size_t x,size_t y);
 uint8_t get_terminal_color_at(size_t x,size_t y);
 const char* get_line_at(size_t y);
