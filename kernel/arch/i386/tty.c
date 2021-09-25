@@ -6,6 +6,7 @@
 #include <kernel/tty.h>
 
 #include "vga.h"
+#include <asm/io.h>
 
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
@@ -16,6 +17,7 @@ static size_t terminal_column;
 static uint8_t terminal_color;
 static uint16_t *terminal_buffer;
 static unsigned char asup = 0;
+
 //Terminal Intialization
 void terminal_initialize(uint8_t _asup)
 {
@@ -167,6 +169,14 @@ uint8_t entry_get_char(uint16_t buff)
 	return (uint8_t)(buff)&0x00FF;
 }
 
+void set_cursor_at(size_t x,size_t y){
+	const uint16_t index = y * VGA_WIDTH + x;
+	outb(FB_COMMAND_PORT,FB_HIGH_BYTE_CMD);
+	outb(FB_DATA_PORT,(index>>8)&0xFF);
+	outb(FB_COMMAND_PORT,FB_LOW_BYTE_CMD);
+	outb(FB_DATA_PORT,index&0xFF);
+}
+
 void new_line(){
 	if (terminal_row==VGA_HEIGHT-1){
 		if (asup==1){auto_scroll_up();terminal_column=0;}
@@ -175,3 +185,5 @@ void new_line(){
 		terminal_row+=1;
 	}
 }
+
+

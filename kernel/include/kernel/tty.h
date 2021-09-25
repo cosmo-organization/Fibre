@@ -4,6 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define FB_COMMAND_PORT 0x3D4
+#define FB_DATA_PORT    0x3D5
+#define FB_HIGH_BYTE_CMD 14
+#define FB_LOW_BYTE_CMD 15
+
 void terminal_initialize(unsigned char asup);
 void terminal_putchar(char c);
 void terminal_putachar(unsigned char color,char c);
@@ -20,5 +25,6 @@ void set_terminal_pos(size_t x,size_t y);
 void auto_scroll_up();
 uint8_t entry_get_color(uint16_t buff);
 uint8_t entry_get_char(uint16_t buff);
+void set_cursor_at(size_t x,size_t y);
 void new_line();
 #endif
